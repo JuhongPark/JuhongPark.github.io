@@ -56,7 +56,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -87,7 +87,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Caffe-로-해보는-MNIST-튜토리얼"><a href="#Caffe-로-해보는-MNIST-튜토리얼" class="headerlink" title="Caffe 로 해보는 MNIST 튜토리얼"></a>Caffe 로 해보는 MNIST 튜토리얼</h1><p>[TOC]</p>
+        <h1 id="caffe-로-해보는-mnist-튜토리얼"><a href="#Caffe-로-해보는-MNIST-튜토리얼" class="headerlink" title="Caffe 로 해보는 MNIST 튜토리얼"></a>Caffe 로 해보는 MNIST 튜토리얼</h1><p>[TOC]</p>
 <p><a href="http://caffe.berkeleyvision.org/" target="_blank" rel="external">Caffe</a> 로 간단한 <a href="https://www.quora.com/What-is-MNIST" target="_blank" rel="external">MNIST</a> 튜토리얼을 해보겠습니다.</p>
 <p>MNIST 는 아래와 같이 숫자를 손글씨로 쓴 데이터셋입니다. 튜토리얼에서는 이런 손글씨에서 숫자를 자동으로 인식하는 딥러닝 모델을 구현하려고 합니다.<br><img src="https://qph.ec.quoracdn.net/main-qimg-d01751bdf7dab3d9a5949f226a35b7ba.webp" alt="MNIST Example"></p>
 <p>Caffe 는 UC Berkeley BVLC 에서 개발된 Deep Learning Framework 입니다. 오픈소스로 개발되었고 필요하시면 언제든지 <a href="https://github.com/BVLC/caffe/" target="_blank" rel="external">github</a> 을 통해 코드를 확인하실 수 있습니다.</p>
@@ -97,7 +97,7 @@
 </ul>
 <p><a href="http://caffe.berkeleyvision.org/installation.html" target="_blank" rel="external">Caffe Installation</a> 을 보면 다양한 설치 방법이 있습니다. 여기서 가장 간단하고 사용할 수 있는 <a href="https://www.docker.com/" target="_blank" rel="external">Docker</a> 를 사용해서 튜토리얼을 진행해보겠습니다. Docker 는 개발자의 시간과 삶을 연장해주는 좋은 친구이니, 처음 접하시는 분은 <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="external">Docker Installation</a> 를 참고해서 이번 기회에 설치해 보시기 바랍니다.</p>
 <hr>
-<h2 id="1-Docker-로-Caffe-설치하기"><a href="#1-Docker-로-Caffe-설치하기" class="headerlink" title="1. Docker 로 Caffe 설치하기"></a>1. Docker 로 Caffe 설치하기</h2><h3 id="Caffe-Docker-가져오기"><a href="#Caffe-Docker-가져오기" class="headerlink" title="Caffe Docker 가져오기"></a>Caffe Docker 가져오기</h3><p>이제 본격적으로 Docker 를 활용하여 Caffe 를 설치해보겠습니다. Caffe 의 Docker 정보가 궁금하신 분은 <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="external">Docker Hub</a> 를 참고하시길 바랍니다.</p>
+<h2 id="1-docker-로-caffe-설치하기"><a href="#1-Docker-로-Caffe-설치하기" class="headerlink" title="1. Docker 로 Caffe 설치하기"></a>1. Docker 로 Caffe 설치하기</h2><h3 id="caffe-docker-가져오기"><a href="#Caffe-Docker-가져오기" class="headerlink" title="Caffe Docker 가져오기"></a>Caffe Docker 가져오기</h3><p>이제 본격적으로 Docker 를 활용하여 Caffe 를 설치해보겠습니다. Caffe 의 Docker 정보가 궁금하신 분은 <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="external">Docker Hub</a> 를 참고하시길 바랍니다.</p>
 <p>Caffe 의 Docker 는 CPU, GPU 2가지 버전이 있습니다. 이번에는 간단히 Caffe 를 접하는 것이 목표이므로 CPU 를 사용해서 진행해보겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ docker pull bvlc/caffe:cpu</div></pre></td></tr></table></figure>
 <p>정상적으로 Pull 이 되었는지 확인하기 위해 Caffe 의 버전을 호출해보겠습니다.</p>
@@ -106,11 +106,11 @@
 <p>이제 아래의 명령을 통해 Docker 를 실행해보겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -ti bvlc/caffe:cpu</div></pre></td></tr></table></figure>
 <hr>
-<h3 id="Caffe-Docker-에-vi-설치하기"><a href="#Caffe-Docker-에-vi-설치하기" class="headerlink" title="Caffe Docker 에 vi 설치하기"></a>Caffe Docker 에 vi 설치하기</h3><p>본격적으로 Caffe 를 사용하기전에 간단하게 셋팅을 먼저해보겠습니다.</p>
+<h3 id="caffe-docker-에-vi-설치하기"><a href="#Caffe-Docker-에-vi-설치하기" class="headerlink" title="Caffe Docker 에 vi 설치하기"></a>Caffe Docker 에 vi 설치하기</h3><p>본격적으로 Caffe 를 사용하기전에 간단하게 셋팅을 먼저해보겠습니다.</p>
 <p>앞서 말씀드린 것처럼, Caffe 는 설정 파일을 변경해서 모델 수정이나 최적화를 할 수 있습니다. 그런데 위에서 설치한 Docker 는 매우 경량화된 Ubuntu 를 사용하기때문에 <code>vi</code>, <code>vim</code>, <code>nano</code> 등이 설치되어 있지 않습니다. 이번 튜토리얼에서는 직접 Docker 내부의 값을 수정하고 살펴볼 것이므로 <code>vi</code> 를 미리 설치하도록 하겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ apt-get update</div><div class="line">$ apt-get install -y vim</div></pre></td></tr></table></figure>
 <hr>
-<h2 id="2-Caffe-로-MNIST-모델-만들기"><a href="#2-Caffe-로-MNIST-모델-만들기" class="headerlink" title="2. Caffe 로 MNIST 모델 만들기"></a>2. Caffe 로 MNIST 모델 만들기</h2><h3 id="MNIST-Data-준비하기"><a href="#MNIST-Data-준비하기" class="headerlink" title="MNIST Data 준비하기"></a>MNIST Data 준비하기</h3><p>이제 Docker 는 모두 셋팅되었으니 MNIST Data 를 준비해보겠습니다.</p>
+<h2 id="2-caffe-로-mnist-모델-만들기"><a href="#2-Caffe-로-MNIST-모델-만들기" class="headerlink" title="2. Caffe 로 MNIST 모델 만들기"></a>2. Caffe 로 MNIST 모델 만들기</h2><h3 id="mnist-data-준비하기"><a href="#MNIST-Data-준비하기" class="headerlink" title="MNIST Data 준비하기"></a>MNIST Data 준비하기</h3><p>이제 Docker 는 모두 셋팅되었으니 MNIST Data 를 준비해보겠습니다.</p>
 <p>우선 Docker 에서 Caffe 가 설치된 위치로 이동해보겠습니다. 참고로 아래의 진행되는 모든 명령어는 <code>CAFFE_ROOT</code> 에서 실행하셔야 정상적으로 작동됩니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> <span class="variable">$CAFFE_ROOT</span></div></pre></td></tr></table></figure>
 <p>Caffe 가 설치된 위치에 여러가지 파일이 있는 것을 확인하실 수 있습니다. 이 중에서 중요한 것만 설명해보겠습니다.</p>
@@ -129,7 +129,7 @@
 <p>변환된 데이터는 <a href="http://leveldb.org/" target="_blank" rel="external">LevelDB</a> 형식으로 변환되어 저장됩니다. 변환된 데이터를 확인해보겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ ls examples/mnist/mnist_*_lmdb</div><div class="line">examples/mnist/mnist_test_lmdb:</div><div class="line">data.mdb  lock.mdb</div><div class="line"></div><div class="line">examples/mnist/mnist_train_lmdb:</div><div class="line">data.mdb  lock.mdb</div></pre></td></tr></table></figure>
 <hr>
-<h3 id="Caffe-학습-설정-변경하기"><a href="#Caffe-학습-설정-변경하기" class="headerlink" title="Caffe 학습 설정 변경하기"></a>Caffe 학습 설정 변경하기</h3><p>이제 바로 Caffe 로 모델을 돌려보면 좋겠지만, 몇가지 수정해야 하는 사항이 있습니다.</p>
+<h3 id="caffe-학습-설정-변경하기"><a href="#Caffe-학습-설정-변경하기" class="headerlink" title="Caffe 학습 설정 변경하기"></a>Caffe 학습 설정 변경하기</h3><p>이제 바로 Caffe 로 모델을 돌려보면 좋겠지만, 몇가지 수정해야 하는 사항이 있습니다.</p>
 <p>간단히 튜토리얼만 돌려보고 싶지만, 실제로는 튜토리얼만 학습하는 것에도 비교적 오랜시간이 소요됩니다. 그래서 설정 파일을 공부할겸, 학습이 일찍 끝나도록 수정해보겠습니다.</p>
 <p>우리가 학습에 사용하는 모델은 <a href="http://yann.lecun.com/exdb/lenet/" target="_blank" rel="external">Lenet</a> 입니다. 우선 MNSIT 예제 파일 내용을 확인해보겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ vi examples/mnist/train_lenet.sh</div><div class="line"></div><div class="line"><span class="meta">#!/usr/bin/env sh</span></div><div class="line"><span class="built_in">set</span> -e</div><div class="line"></div><div class="line">./build/tools/caffe train --solver=examples/mnist/lenet_solver.prototxt <span class="variable">$@</span></div></pre></td></tr></table></figure>
@@ -150,7 +150,7 @@
 <p>저는 앞서 말씀드린것처럼, 튜토리얼의 학습 시간을 단축하고 CPU 를 사용하기 위해 아래와 같이 설정을 변경하였습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">test_iter: 50</div><div class="line">test_interval: 200</div><div class="line">max_iter: 1000</div><div class="line">snapshot: 200</div><div class="line">solver_mode: CPU</div></pre></td></tr></table></figure>
 <hr>
-<h3 id="Caffe-모델-학습하기"><a href="#Caffe-모델-학습하기" class="headerlink" title="Caffe 모델 학습하기"></a>Caffe 모델 학습하기</h3><p>이제 드디어 Caffe 로 모델을 학습해보겠습니다! 간단히 아래와 같이 실행합니다.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./examples/mnist/train_lenet.sh</div></pre></td></tr></table></figure></p>
+<h3 id="caffe-모델-학습하기"><a href="#Caffe-모델-학습하기" class="headerlink" title="Caffe 모델 학습하기"></a>Caffe 모델 학습하기</h3><p>이제 드디어 Caffe 로 모델을 학습해보겠습니다! 간단히 아래와 같이 실행합니다.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./examples/mnist/train_lenet.sh</div></pre></td></tr></table></figure></p>
 <p>학습을 시작하면 아래와 같이 로그가 출력됩니다.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">I0604 03:46:11.742939   465 solver.cpp:330] Iteration 200, Testing net (<span class="comment">#0)</span></div><div class="line">I0604 03:46:14.321601   468 data_layer.cpp:73] Restarting data prefetching from start.</div><div class="line">I0604 03:46:14.537012   465 solver.cpp:397]     Test net output <span class="comment">#0: accuracy = 0.946</span></div><div class="line">I0604 03:46:14.537225   465 solver.cpp:397]     Test net output <span class="comment">#1: loss = 0.180661 (* 1 = 0.180661 loss)</span></div><div class="line">I0604 03:46:14.620964   465 solver.cpp:218] Iteration 200 (8.8098 iter/s, 11.351s/100 iters), loss = 0.136332</div><div class="line">I0604 03:46:14.621160   465 solver.cpp:237]     Train net output <span class="comment">#0: loss = 0.136332 (* 1 = 0.136332 loss)</span></div><div class="line">I0604 03:46:14.621219   465 sgd_solver.cpp:105] Iteration 200, lr = 0.00985258</div></pre></td></tr></table></figure></p>
 <p>이 중에서 중요한 부분을 살펴보겠습니다.</p>
 <ul>
@@ -162,7 +162,7 @@
 <li>lr: 현재 학습 중인 Learning Rate 를 보여줍니다.</li>
 </ul>
 <hr>
-<h3 id="Caffe-모델-사용하기"><a href="#Caffe-모델-사용하기" class="headerlink" title="Caffe 모델 사용하기"></a>Caffe 모델 사용하기</h3><p>위에서 학습한 모델을 확인해보겠습니다.</p>
+<h3 id="caffe-모델-사용하기"><a href="#Caffe-모델-사용하기" class="headerlink" title="Caffe 모델 사용하기"></a>Caffe 모델 사용하기</h3><p>위에서 학습한 모델을 확인해보겠습니다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ls examples/mnist/lenet_iter_*.caffemodel</div><div class="line">examples/mnist/lenet_iter_1000.caffemodel  examples/mnist/lenet_iter_400.caffemodel  examples/mnist/lenet_iter_800.caffemodel</div><div class="line">examples/mnist/lenet_iter_200.caffemodel   examples/mnist/lenet_iter_600.caffemodel</div></pre></td></tr></table></figure>
 <p><code>lenet_iter_200.caffemodel</code> 부터 <code>lenet_iter_1000.caffemodel</code> 까지 5개의 모델이 만들어진 것을 확인할 수 있습니다. 이것은 위에서 설정한 <code>max_iter: 1000</code>  와 <code>snapshot: 200</code> 에 의한 결과인데, 1000번의 Iteration 도중 200번째 Iteration 마다 학습 모델을 저장한 것입니다.</p>
 <p>그럼 이제 만들어진 학습 모델를 사용해서 실제 MNIST 의 손글씨를 숫자로 인식하도록 해보겠습니다. 아래와 같이 명령어를 입력하면 모델이 인식한 값과 실제 정답을 비교한 뒤 결과를 알려줍니다.</p>
@@ -178,7 +178,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/04/Caffe-로-해보는-MNIST-튜토리얼/" data-id="cj3ibqen70001a3xu1pf2aj7q" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/04/Caffe-로-해보는-MNIST-튜토리얼/" data-id="cj3ibspj60002axxuj9orjkyn" class="article-share-link">Delen</a>
       
       
     </footer>
@@ -188,7 +188,7 @@
 <nav id="article-nav">
   
     <a href="/2017/06/04/test-post/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
+      <strong class="article-nav-caption">Nieuwer</strong>
       <div class="article-nav-title">
         
           test post
@@ -198,7 +198,7 @@
   
   
     <a href="/2017/06/04/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">Ouder</strong>
       <div class="article-nav-title">Hello World</div>
     </a>
   
@@ -221,7 +221,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archieven</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
     </div>
@@ -231,7 +231,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Recente berichten</h3>
     <div class="widget">
       <ul>
         
