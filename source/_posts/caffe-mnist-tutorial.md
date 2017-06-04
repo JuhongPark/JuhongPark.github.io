@@ -1,0 +1,267 @@
+---
+title: Caffe 로 해보는 MNIST 튜토리얼
+date: 2017-06-04 15:35:42
+tags:
+---
+
+<!-- toc -->
+
+[Caffe][1] 로 간단한 [MNIST][7] 튜토리얼을 해보겠습니다.
+
+MNIST 는 아래와 같이 숫자를 손글씨로 쓴 데이터셋입니다. 튜토리얼에서는 이런 손글씨에서 숫자를 자동으로 인식하는 딥러닝 모델을 구현하려고 합니다.
+![MNIST Example](https://qph.ec.quoracdn.net/main-qimg-d01751bdf7dab3d9a5949f226a35b7ba.webp)
+
+Caffe 는 UC Berkeley BVLC 에서 개발된 Deep Learning Framework 입니다. 오픈소스로 개발되었고 필요하시면 언제든지 [github][2] 을 통해 코드를 확인하실 수 있습니다.
+
+Caffe 에는 여러가지 특징이 있습니다. 그 중에서 이번 튜토리얼로 직접 체험하실 수 있는 **Expressive Architecture** 에 대해 간단히 소개하겠습니다.
+
+- Expressive architecture
+Caffe 는 딥러닝 모델 구현과 최적화가 Configuration 만으로 가능합니다. 복잡한 코딩 없이 설정 변경만으로 딥러닝 모델을 수정할 수 있고, GPU 를 사용하여 모델을 학습하는 것 역시 간단한 설정 변경으로 가능합니다.
+
+[Caffe Installation][3] 을 보면 다양한 설치 방법이 있습니다. 여기서 가장 간단하고 사용할 수 있는 [Docker][4] 를 사용해서 튜토리얼을 진행해보겠습니다. Docker 는 개발자의 시간과 삶을 연장해주는 좋은 친구이니, 처음 접하시는 분은 [Docker Installation][5] 를 참고해서 이번 기회에 설치해 보시기 바랍니다.
+
+----
+
+# 1. Docker 로 Caffe 설치하기
+
+----
+
+## Caffe Docker 가져오기
+
+이제 본격적으로 Docker 를 활용하여 Caffe 를 설치해보겠습니다. Caffe 의 Docker 정보가 궁금하신 분은 [Docker Hub][5] 를 참고하시길 바랍니다.
+
+Caffe 의 Docker 는 CPU, GPU 2가지 버전이 있습니다. 이번에는 간단히 Caffe 를 접하는 것이 목표이므로 CPU 를 사용해서 진행해보겠습니다.
+
+```bash
+$ docker pull bvlc/caffe:cpu
+```
+
+정상적으로 Pull 이 되었는지 확인하기 위해 Caffe 의 버전을 호출해보겠습니다.
+
+```bash
+$ docker run -ti bvlc/caffe:cpu caffe --version
+caffe version 1.0.0
+```
+
+위와 같이 버전 정보가 나오면 정상적으로 설치된 것 입니다.
+
+이제 아래의 명령을 통해 Docker 를 실행해보겠습니다.
+
+```bash
+docker run -ti bvlc/caffe:cpu
+```
+
+----
+
+## Caffe Docker 에 vi 설치하기
+
+본격적으로 Caffe 를 사용하기전에 간단하게 셋팅을 먼저해보겠습니다.
+
+앞서 말씀드린 것처럼, Caffe 는 설정 파일을 변경해서 모델 수정이나 최적화를 할 수 있습니다. 그런데 위에서 설치한 Docker 는 매우 경량화된 Ubuntu 를 사용하기때문에 `vi`, `vim`, `nano` 등이 설치되어 있지 않습니다. 이번 튜토리얼에서는 직접 Docker 내부의 값을 수정하고 살펴볼 것이므로 `vi` 를 미리 설치하도록 하겠습니다.
+
+```bash
+$ apt-get update
+$ apt-get install -y vim
+```
+
+----
+
+# 2. Caffe 로 MNIST 모델 만들기
+
+----
+
+## MNIST Data 준비하기
+
+이제 Docker 는 모두 셋팅되었으니 MNIST Data 를 준비해보겠습니다.
+
+우선 Docker 에서 Caffe 가 설치된 위치로 이동해보겠습니다. 참고로 아래의 진행되는 모든 명령어는 `CAFFE_ROOT` 에서 실행하셔야 정상적으로 작동됩니다.
+
+```bash
+$ cd $CAFFE_ROOT
+```
+
+Caffe 가 설치된 위치에 여러가지 파일이 있는 것을 확인하실 수 있습니다. 이 중에서 중요한 것만 설명해보겠습니다.
+
+- data: 데이터가 저장된 폴더
+- examples: 예제 프로그램이 저장된 폴더
+- build: Caffe 실행 파일이 저장된 폴더
+
+우리는 examles 중에서도 MNIST 를 실행하는 것이 목표입니다.
+
+그러려면 우선 Data 를 가져와야겠죠? 아래의 명령어를 통해 데이터를 가져옵시다.
+
+```bash
+$ ./data/mnist/get_mnist.sh
+```
+
+data 폴더를 확인해보면 데이터가 다운된 것을 확인 할 수 있습니다.
+
+```bash
+$ ls ./data/mnist
+get_mnist.sh  t10k-images-idx3-ubyte  t10k-labels-idx1-ubyte  train-images-idx3-ubyte  train-labels-idx1-ubyte
+```
+
+이제 다운 받은 데이터를 활용해서 Caffe 에 입력하는 데이터 형태로 변환하겠습니다. 이미 예제 프로그램이 작성되어 있으므로 실행해보겠습니다.
+
+```bash
+$ ./examples/mnist/create_mnist.sh
+```
+
+변환된 데이터는 [LevelDB][8] 형식으로 변환되어 저장됩니다. 변환된 데이터를 확인해보겠습니다.
+
+```bash
+$ ls examples/mnist/mnist_*_lmdb
+examples/mnist/mnist_test_lmdb:
+data.mdb  lock.mdb
+
+examples/mnist/mnist_train_lmdb:
+data.mdb  lock.mdb
+```
+
+----
+
+## Caffe 학습 설정 변경하기
+
+이제 바로 Caffe 로 모델을 돌려보면 좋겠지만, 몇가지 수정해야 하는 사항이 있습니다.
+
+간단히 튜토리얼만 돌려보고 싶지만, 실제로는 튜토리얼만 학습하는 것에도 비교적 오랜시간이 소요됩니다. 그래서 설정 파일을 공부할겸, 학습이 일찍 끝나도록 수정해보겠습니다.
+
+우리가 학습에 사용하는 모델은 [Lenet][9] 입니다. 우선 MNSIT 예제 파일 내용을 확인해보겠습니다.
+
+```bash
+$ vi examples/mnist/train_lenet.sh
+
+#!/usr/bin/env sh
+set -e
+
+./build/tools/caffe train --solver=examples/mnist/lenet_solver.prototxt $@
+```
+아래쪽의 명령어를 해석해보면, `./build/tools/caffe` 로 `train` 하는데 `--solver=examples/mnist/lenet_solver.prototxt` 를 사용하겠다는 것입니다.
+
+여기서 `--solver` 를 어떻게 설정하느냐가 가장 중요한 포인트입니다. 그럼 `lenet_solver.prototxt` 파일을 직접 열어서 확인해보겠습니다. 파일이 너무 길어져서 주석은 제거했습니다.
+
+```bash
+$ vi examples/mnist/lenet_solver.prototxt
+
+net: "examples/mnist/lenet_train_test.prototxt"
+test_iter: 100
+test_interval: 500
+base_lr: 0.01
+momentum: 0.9
+weight_decay: 0.0005
+lr_policy: "inv"
+gamma: 0.0001
+power: 0.75
+display: 100
+max_iter: 10000
+snapshot: 5000
+snapshot_prefix: "examples/mnist/lenet"
+solver_mode: GPU
+```
+
+여기서 중요한 설정 값 몇개를 확인해보겠습니다.
+
+- net: 실제 모델이 정의된 설정 파일입니다. 여기서 나온 `lenet_train_test.prototxt` 도 직접 열어서 확인해보시기를 권장합니다. 간단히 설명하자면 `Type` 은 해당 Layer 를 정의하는 것이고, `bottom` 은 Layer 의 입력층, `top` 은 Layer 의 출력층을 정의하는 것입니다. 자세한 설명은 이번 튜토리얼 범위를 벗어나게 되므로 [API Documentation][10] 를 확인해주시기 바랍니다.
+- test_iter: test 를 위해 몇번의 Iteration 를 돌 것인지에 설정합니다.
+- test_interval: Test 를 실행하는 간격을 설정합니다.
+- base_lr: [Learning Rate][11] 의 초기값을 설정합니다. Learning Rate 는 학습 속도를 정의하는 것인데, 값이 너무 작으면 학습속도가 느려지게되고 이 값이 너무 크면 [Overfitting][12] 이 될 수 있습니다.
+- display: 학습 도중에 몇번의 Iteration 마다 중간 결과를 보여줄 것인지 설정합니다.
+- max_iter: 학습을 실행하는 최대 Iteration 을 설정합니다.
+- snapshot: 학습 도중에 특정 Iteration 마다 모델의 중간 결과를 저장 할 수 있습니다. 이 설정은 몇번째 Iteration 마다 중간 결과를 저장할 것인지 설정합니다.
+- solver_mode: 모델을 CPU, GPU 중에서 어떤 것으로 학습할지를 설정합니다. 이처럼 Caffe 는 CPU, GPU 사이의 설정 변경이 매우 간단합니다.
+
+저는 앞서 말씀드린것처럼, 튜토리얼의 학습 시간을 단축하고 CPU 를 사용하기 위해 아래와 같이 설정을 변경하였습니다.
+
+```bash
+test_iter: 50
+test_interval: 200
+max_iter: 1000
+snapshot: 200
+solver_mode: CPU
+```
+
+----
+
+## Caffe 모델 학습하기
+
+이제 드디어 Caffe 로 모델을 학습해보겠습니다! 간단히 아래와 같이 실행합니다.
+```bash
+$ ./examples/mnist/train_lenet.sh
+```
+학습을 시작하면 아래와 같이 로그가 출력됩니다.
+```bash
+I0604 03:46:11.742939   465 solver.cpp:330] Iteration 200, Testing net (#0)
+I0604 03:46:14.321601   468 data_layer.cpp:73] Restarting data prefetching from start.
+I0604 03:46:14.537012   465 solver.cpp:397]     Test net output #0: accuracy = 0.946
+I0604 03:46:14.537225   465 solver.cpp:397]     Test net output #1: loss = 0.180661 (* 1 = 0.180661 loss)
+I0604 03:46:14.620964   465 solver.cpp:218] Iteration 200 (8.8098 iter/s, 11.351s/100 iters), loss = 0.136332
+I0604 03:46:14.621160   465 solver.cpp:237]     Train net output #0: loss = 0.136332 (* 1 = 0.136332 loss)
+I0604 03:46:14.621219   465 sgd_solver.cpp:105] Iteration 200, lr = 0.00985258
+```
+이 중에서 중요한 부분을 살펴보겠습니다.
+
+- Iteration: 학습 중인 Iteration 횟수를 보여줍니다
+- Train net output: Train Data 의 모델 학습 결과를 보여줍니다.
+- Test net output: Test Data 의 모델 학습 결과를 보여줍니다.
+- accuracy: Accuracy 값을 보여줍니다.
+- loss: Loss 값을 보여줍니다
+- lr: 현재 학습 중인 Learning Rate 를 보여줍니다.
+
+----
+
+## Caffe 모델 사용하기
+
+위에서 학습한 모델을 확인해보겠습니다.
+
+```bash
+$ ls examples/mnist/lenet_iter_*.caffemodel
+examples/mnist/lenet_iter_1000.caffemodel  examples/mnist/lenet_iter_400.caffemodel  examples/mnist/lenet_iter_800.caffemodel
+examples/mnist/lenet_iter_200.caffemodel   examples/mnist/lenet_iter_600.caffemodel
+```
+
+`lenet_iter_200.caffemodel` 부터 `lenet_iter_1000.caffemodel` 까지 5개의 모델이 만들어진 것을 확인할 수 있습니다. 이것은 위에서 설정한 `max_iter: 1000`  와 `snapshot: 200` 에 의한 결과인데, 1000번의 Iteration 도중 200번째 Iteration 마다 학습 모델을 저장한 것입니다.
+
+그럼 이제 만들어진 학습 모델를 사용해서 실제 MNIST 의 손글씨를 숫자로 인식하도록 해보겠습니다. 아래와 같이 명령어를 입력하면 모델이 인식한 값과 실제 정답을 비교한 뒤 결과를 알려줍니다.
+
+```bash
+$ ./build/tools/caffe test -model ./examples/mnist/lenet_train_test.prototxt -weights ./examples/mnist/lenet_iter_200.caffemodel
+
+...
+
+I0604 03:51:57.976830   473 caffe.cpp:330] accuracy = 0.8978
+I0604 03:51:57.977108   473 caffe.cpp:330] loss = 0.332346 (* 1 = 0.332346 loss)
+```
+위의 명령어를 간단하게 살펴보면 `./build/tools/caffe` 로 `test` 하는데 `-model ./examples/mnist/lenet_train_test.prototxt` 를 모델로 사용하고 `-weights ./examples/mnist/lenet_iter_200.caffemodel` 의 학습 결과를 적용하겠다는 것입니다.
+
+`lenet_iter_200.caffemodel` 는 200번째 Iteration 이후의 결과인데 `accuracy = 0.8978` 입니다. 나쁜 수치는 아닌 것 같지만 아쉬운 결과입니다.
+
+그럼 이보다 5배 많이 학습한 `lenet_iter_1000.caffemodel` 은 어떨까요?
+
+```bash
+$ ./build/tools/caffe test -model ./examples/mnist/lenet_train_test.prototxt -weights ./examples/mnist/lenet_iter_1000.caffemodel
+
+...
+
+I0604 03:57:36.841078   476 caffe.cpp:330] accuracy = 0.9746
+I0604 03:57:36.841120   476 caffe.cpp:330] loss = 0.0788368 (* 1 = 0.0788368 loss)
+```
+
+`lenet_iter_1000.caffemodel` 은 `accuracy = 0.9746` 로 `lenet_iter_200.caffemodel` 보다 훨씬 좋은 성능을 보여줍니다! 물론 모델에 따라 항상 그런것은 아니지만, 대체로 Iteration 이 올라가면 어느정도 성능이 향상되는 것을 확인 할 수 있습니다.
+
+----
+
+그럼 여기까지 Caffe 를 사용해봤습니다. Caffe 는 간단한 설정파일 변경만으로도 Model 을 구현할 수 있다는 장점이 있습니다. MNIST 튜토리얼을 해보시고 궁금하신 점이 있으시면 [JPark@JPark.me][13] 로 언제든지 편하게 연락주시기 바랍니다.
+
+[1]:http://caffe.berkeleyvision.org/
+[2]:https://github.com/BVLC/caffe/
+[3]:http://caffe.berkeleyvision.org/installation.html
+[4]:https://www.docker.com/
+[5]:https://docs.docker.com/engine/installation/
+[6]:https://hub.docker.com/r/bvlc/caffe/
+[7]:https://www.quora.com/What-is-MNIST
+[8]:http://leveldb.org/
+[9]:http://yann.lecun.com/exdb/lenet/
+[10]:http://caffe.berkeleyvision.org/doxygen/annotated.html
+[11]:https://www.quora.com/What-is-the-learning-rate-in-neural-networks
+[12]:https://en.wikipedia.org/wiki/Overfitting
+[13]:mailto:JPark@JPark.me
