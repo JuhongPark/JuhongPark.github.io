@@ -107,7 +107,7 @@ get_mnist.sh  t10k-images-idx3-ubyte  t10k-labels-idx1-ubyte  train-images-idx3-
 $ ./examples/mnist/create_mnist.sh
 ```
 
-변환된 데이터는 [LevelDB][8] 형식으로 변환되어 저장됩니다. 변환된 데이터를 확인해보겠습니다.
+변환된 데이터는 [LMDB][8] 형식으로 변환되어 저장됩니다. 변환된 데이터를 확인해보겠습니다.
 
 ```bash
 $ ls examples/mnist/mnist_*_lmdb
@@ -259,7 +259,7 @@ I0604 03:57:36.841120   476 caffe.cpp:330] loss = 0.0788368 (* 1 = 0.0788368 los
 [5]:https://docs.docker.com/engine/installation/
 [6]:https://hub.docker.com/r/bvlc/caffe/
 [7]:https://www.quora.com/What-is-MNIST
-[8]:http://leveldb.org/
+[8]:http://www.lmdb.tech/doc/index.html
 [9]:http://yann.lecun.com/exdb/lenet/
 [10]:http://caffe.berkeleyvision.org/doxygen/annotated.html
 [11]:https://www.quora.com/What-is-the-learning-rate-in-neural-networks
