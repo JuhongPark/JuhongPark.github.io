@@ -63,7 +63,7 @@ ga('send', 'pageview');
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blog.jpark.me"></form>
@@ -73,6 +73,95 @@ ga('send', 'pageview');
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-jupyter-notebook-pep8" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/24/jupyter-notebook-pep8/" class="article-date">
+  <time datetime="2017-06-24T05:08:42.000Z" itemprop="datePublished">2017-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/24/jupyter-notebook-pep8/">Jupyter Notebook 에 PEP8 적용하기</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- toc -->
+<ul>
+<li><a href="#1-pep8">1. PEP8</a></li>
+<li><a href="#2-autopep8">2. Autopep8</a></li>
+<li><a href="#3-jupyter-notebook-에-autopep8-붙이기">3. Jupyter Notebook 에 Autopep8 붙이기</a></li>
+</ul>
+<!-- tocstop -->
+<p>Python 으로 데이터 분석을 할때 <a href="http://jupyter.org/" target="_blank" rel="external">Jupyter Notebook</a> 을 사용하면 공유나 문서화에 아주 큰 장점이 있습니다.</p>
+<p>그런데 Jupyter Notebook 을 사용하여 여러사람들과 작업하다보니 Coding Style 서로 조금씩 달라서 PEP8 로 천하통일을 하려고 했습니다.</p>
+<p><img src="http://newsmanager2.etomato.com/userfiles/image/%EC%B5%9C%EC%A4%80%ED%98%B8/1222_roll.png" alt="PEP8 로 Coding Style 천하통일하기"></p>
+<p>그래서 간단하게 PEP8 을 Jupyter Notebook 에 붙이는 방법에 대해 살펴보고자합니다.</p>
+<hr>
+<h1 id="1-pep8"><a href="#1-PEP8" class="headerlink" title="1. PEP8"></a>1. PEP8</h1><p>우선 <a href="https://www.python.org/dev/peps/pep-0008/" target="_blank" rel="external">PEP8</a> 이 뭔가 살펴보겠습니다.</p>
+<p>한국에서도 사람마다 말하는 방식이 다양합니다. 사람마다 주로 사용하는 단어가 있기도하고 연령, 지역별로 말하는 방식이 다르기도 합니다. 심한 방언의 경우 이해하기 어려운 경우도 있습니다.</p>
+<p><img src="http://ppss.kr/wp-content/uploads/2016/07/%ED%99%8D%EC%A4%80%ED%91%9C_%EB%A7%89%EB%A7%90_%EB%85%BC%EB%9E%80_%EB%8F%84%EC%9D%98%EC%9B%90_%EC%93%B0%EB%A0%88%EA%B8%B0_%EA%B0%9C_7.jpg" alt="세상에는 이런 방식으로 말하는 사람도 있습니다"></p>
+<p>그래서 원활한 의사소통을 위해 공식적으로 표준 언어규범을 정하는데 바로 표준어입니다. 한국어에도 물론 표준어가 존재하고 아래와 같이 규정되어 있습니다.</p>
+<blockquote>
+<p><strong>대한민국 표준어</strong><br>표준어는 교양 있는 사람들이 두루 쓰는 현대 서울말로 정함을 원칙으로 한다. </p>
+</blockquote>
+<p>저는 이 규정을 볼때마다 <code>내가 과연 교양이 있는 사람인가...</code> 에 대한 고민에 빠지곤 합니다.</p>
+<p>여튼 이런 표준어처럼 Python 의 세상에도 공식적으로 정한 표준 언어규범이 있는데, 그게 바로 PEP8 입니다. 프로그래머 마다의 습관이 있으니 실제 Coding Style 은 다를 수 있지만, 공동작업을 하거나 외부에 코드를 공유할 경우에는 이런 규칙이 정해져 있으면 편하게 사용할 수 있습니다.</p>
+<hr>
+<h1 id="2-autopep8"><a href="#2-Autopep8" class="headerlink" title="2. Autopep8"></a>2. Autopep8</h1><p>그렇지만 우리가 표준어를 사용하기 위해, 표준어 규칙을 외우고 다니려면 참 피곤할 것 같습니다. 물론 중요한 표현이나 맞춤법은 숙지하고 있어야하지만 아나운서나 기자가 아닌 이상 완벽하게 알고 있기는 어렵습니다.</p>
+<p>PEP8 도 마찬가지입니다. 프로그래머들이 본능적으로 일부 숙지하고 있지만 모든 규정을 완벽하게 외우기는 거의 불가능합니다.</p>
+<p>이런 어려움을 돕기위해 자동으로 PEP8 을 적용해주는 착한 친구가 있으니 바로 <a href="https://pypi.python.org/pypi/autopep8" target="_blank" rel="external">Autopep8</a> 입니다. pip 로 설치가 가능하고 conda 로도 설치가 가능합니다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># pip 로 설치</span></div><div class="line">$ pip install autopep8</div></pre></td></tr></table></figure>
+<p>또는<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># conda 로 설치</span></div><div class="line">$ conda install autopep8</div></pre></td></tr></table></figure></p>
+<p>간단하게 사용방법을 살펴보겠습니다.</p>
+<p>우선 import 해서 python code 안에서 사용 할 수 있습니다.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> autopep8</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>autopep8.fix_code(<span class="string">"x=       1"</span>)</div><div class="line"><span class="string">'x = 1\n'</span></div></pre></td></tr></table></figure></p>
+<p>혹은 파일에 바로 적용할 수도 있습니다.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">echo</span> <span class="string">"x=       1"</span> &gt; bad.py</div><div class="line">$ autopep8 bad.py</div><div class="line">x = 1</div></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="3-jupyter-notebook-에-autopep8-붙이기"><a href="#3-Jupyter-Notebook-에-Autopep8-붙이기" class="headerlink" title="3. Jupyter Notebook 에 Autopep8 붙이기"></a>3. Jupyter Notebook 에 Autopep8 붙이기</h1><p>이제 여기서부터 제가 이 포스트를 작성한 이유, Jupyter Notebook 에 Autopep8 을 붙이는 방법에 대해 살펴보겠습니다.</p>
+<p>IPython 의 공식 <a href="https://github.com/ipython/ipython/wiki/Extensions-Index#pep8" target="_blank" rel="external">github wiki</a> 를 보면  <code>%%pep8</code>  라는 cell magic 이 나옵니다. 그리고 친절하게 <a href="http://nbviewer.jupyter.org/github/SiggyF/notebooks/blob/master/styleguide.ipynb" target="_blank" rel="external">예제 Notebook</a> 도 작성되어 있습니다.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">%install_ext https://raw.githubusercontent.com/SiggyF/notebooks/master/pep8_magic.py</div><div class="line">%load_ext pep8_magic</div></pre></td></tr></table></figure>
+<p>그런데 문제는, 여기서 사용한 <code>install_ext</code> 가 IPython 4.0 부터 Deprecated 되었고 5.0 부터는 아예 삭제되었습니다. 관심이 있으신분은 <a href="https://github.com/ipython/ipython/issues/8634" target="_blank" rel="external">#8634</a> 을 참고하시면 됩니다.</p>
+<p>그래서 다른 방법을 찾아보던 중, <a href="https://github.com/ipython-contrib/jupyter_contrib_nbextensions" target="_blank" rel="external">jupyter_contrib_nbextensions</a> 라는 좋은 친구를 발견하게 되었습니다.</p>
+<p>아래와 같이 Jupyter Notebook 에서 nbextension 을 직접 관리 할 수 있게 도와줍니다. Autopep8 도 nbextension 형태로 제공되어 있어서 jupyter_contrib_nbextensions 를 사용하면 간편하게 Autopep8 을 붙일 수 있습니다.</p>
+<p><img src="https://raw.githubusercontent.com/Jupyter-contrib/jupyter_nbextensions_configurator/master/src/jupyter_nbextensions_configurator/static/nbextensions_configurator/icon.png" alt="jupyter_contrib_nbextensions 의 우월한 관리화면"></p>
+<p>설치 방법은 pip 와 conda 모두 지원하고 있습니다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># pip 로 설치</span></div><div class="line">$ pip install jupyter_contrib_nbextensions</div></pre></td></tr></table></figure>
+<p>또는<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># conda 로 설치</span></div><div class="line">$ conda install -c conda-forge jupyter_contrib_nbextensions</div></pre></td></tr></table></figure></p>
+<p>그 다음에는 jupyter_contrib_nbextensions 에 필요한 Javascript 와 CSS 을 가져옵니다.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ jupyter contrib nbextension install</div></pre></td></tr></table></figure></p>
+<p>마지막으로 Autopep8 을 enable 해보겠습니다. 여기서 당연한 이야기지만, Autopep8 를 위에서 설명한 방식대로 미리 설치두셔야 합니다.</p>
+<p>Enable 은 간단하게 아래와 같이 NBextentions 에서 Autopep8 를 체크해주시면 됩니다.</p>
+<p><img src="/images/autopep8_enable.png" alt="Autopep8 enable"></p>
+<p>단, 여기서 중요한 것은 위 스크린샷의<code>compatibility: Jupyter (4.x)</code> 에서 보시는 것처럼 Jupyper 의 버전을 4.x 대로 맞춰야한다는 것입니다.</p>
+<p>저의 경우 이미 5.x 를 사용하고 있었기 때문에 Enable 할 수 없었습니다. 그러나 특별히 5.x 의 기능 중에 당장 필요한 것이 없어서 4.x 로 버전을 내려왔습니다. 저는 4.3.0 버전으로 변경하였습니다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># pip 로 설치</span></div><div class="line">$ pip install jupyter_core==4.3.0</div></pre></td></tr></table></figure>
+<p>또는<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># conda 로 설치</span></div><div class="line">$ conda install jupyter_core==4.3.0</div></pre></td></tr></table></figure></p>
+<p>이제 여기까지 되시면 Jupyter Notebook 에서 Autopep8 를 사용하실 수 있습니다.</p>
+<p>단축키를 사용하여 Autopep8 을 적용하는데 NBextentions 설정창에서 단축키를 확인, 변경할 수 있습니다.</p>
+<p>제가 사용하는 Mac 기준으로는 <code>⌥A</code> 를 하시면 선택한 Cell 만, <code>⌥⇧A</code> 를 하시면 전체 Cell 에서 적용되니 참고하시기 바랍니다.</p>
+<p>포스트를 참고해서 Jupyter Notebook 에 PEP8 을 적용해보시고 궁금하신 점이 있으시면 <a href="mailto:JPark@JPark.me" target="_blank" rel="external">JPark@JPark.me</a> 로 언제든지 편하게 연락주시기 바랍니다.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.jpark.me/2017/06/24/jupyter-notebook-pep8/" data-id="cj4atwmqu0000gjxuclb7wr6e" class="article-share-link">Delen</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-caffe-mnist-tutorial" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -204,7 +293,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.jpark.me/2017/06/04/caffe-mnist-tutorial/" data-id="cj3isghih0000crxuwrm72ypk" class="article-share-link">Share</a>
+      <a data-url="http://blog.jpark.me/2017/06/04/caffe-mnist-tutorial/" data-id="cj4atwmr20001gjxuvm7vtr89" class="article-share-link">Delen</a>
       
       
     </footer>
@@ -229,7 +318,7 @@ ga('send', 'pageview');
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archieven</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
     </div>
@@ -239,9 +328,13 @@ ga('send', 'pageview');
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Recente berichten</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/06/24/jupyter-notebook-pep8/">Jupyter Notebook 에 PEP8 적용하기</a>
+          </li>
         
           <li>
             <a href="/2017/06/04/caffe-mnist-tutorial/">Caffe 로 해보는 MNIST 튜토리얼</a>
